@@ -17,21 +17,24 @@ router.post("/", (req, res) => {
     id: genres.length + 1,
     name: req.body.name,
   };
-  if (!genre) return res.status(400).send("Bad request");
+  if (!genre || !genre.name)
+    return res.status(400).send("Invalid genre, try it again.");
   genres.push(genre);
   res.send(genre);
 });
 
 router.put("/:id", (req, res) => {
   const genre = genres.find((c) => c.id === parseInt(req.params.id));
-  if (!genre) return res.status(404).send("Genre was not found");
+  if (!genre)
+    return res.status(404).send("The genre with the given ID was not found.");
   genre.name = req.body.name;
   res.send(genre);
 });
 
 router.delete("/:id", (req, res) => {
   const genre = genres.find((c) => c.id === parseInt(req.params.id));
-  if (!genre) return res.status(404).send("Course was not find");
+  if (!genre)
+    return res.status(404).send("The genre with the given ID was not found.");
   const index = genres.indexOf(genre);
   genres.splice(index, 1);
   res.send(genre);
