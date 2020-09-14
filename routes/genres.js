@@ -1,8 +1,6 @@
 const joi = require("joi");
 const express = require("express");
 const mongoose = require("mongoose");
-const Joi = require("joi");
-// const app = express() It does not work when we separate the files
 const router = express.Router();
 
 const Genre = mongoose.model(
@@ -16,12 +14,6 @@ const Genre = mongoose.model(
     },
   })
 );
-
-// const genres = [
-//   { id: 1, name: "Action" },
-//   { id: 2, name: "Horror" },
-//   { id: 3, name: "Romance" },
-// ];
 
 router.get("/", async (req, res) => {
   const genres = await Genre.find().sort("name");
@@ -43,11 +35,9 @@ router.put("/:id", async (req, res) => {
   try {
     const { error } = validateGenre(req.body);
     if (error) return res.status(400).send(error.details[0].message);
-    // Update first approach
     const genre = await Genre.findByIdAndUpdate(
       req.params.id,
       { name: req.body.name },
-      // Get the updated object
       { new: true, useFindAndModify: false }
     );
 
@@ -55,11 +45,6 @@ router.put("/:id", async (req, res) => {
   } catch (ex) {
     return res.status(404).send("The genre with the given ID was not found.");
   }
-
-  // if (!genre)
-  //   return res.status(404).send("The genre with the given ID was not found.");
-
-  // res.send(genre);
 });
 
 router.delete("/:id", async (req, res) => {
@@ -84,7 +69,7 @@ router.get("/:id", async (req, res) => {
 
 function validateGenre(genre) {
   const schema = joi.object({
-    name: Joi.string().required().min(3),
+    name: joi.string().required().min(3),
   });
 
   return schema.validate(genre);
