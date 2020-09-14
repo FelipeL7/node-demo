@@ -1,28 +1,6 @@
-const joi = require("joi");
 const express = require("express");
-const mongoose = require("mongoose");
-
+const { Customer, validate } = require("../models/customer");
 const router = express.Router();
-
-const Customer = mongoose.model(
-  "Customer",
-  new mongoose.Schema({
-    isGold: {
-      type: Boolean,
-      default: false,
-    },
-    name: {
-      type: String,
-      required: true,
-      minlength: 5,
-    },
-    phone: {
-      type: Number,
-      required: true,
-      minlength: 5,
-    },
-  })
-);
 
 router.get("/", async (req, res) => {
   const customers = await Customer.find().sort("name");
@@ -31,7 +9,7 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { error } = validateCustomer(req.body);
+  const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   let customer = new Customer({
@@ -46,7 +24,7 @@ router.post("/", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   try {
-    const { error } = validateCustomer(req.body);
+    const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
     const customer = await Customer.findByIdAndUpdate(
       req.params.id,
@@ -57,6 +35,11 @@ router.put("/:id", async (req, res) => {
       },
       { new: true, useFindAndModify: false }
     );
+
+    if (!customer)
+      return res
+        .status(404)
+        .send("The customer with the given ID was not found.");
 
     res.send(customer);
   } catch (ex) {
@@ -70,19 +53,11 @@ router.delete("/:id", async (req, res) => {
   });
 
   if (!customer)
-    res.status(404).send("The customer with the given ID was not found.");
+    return res
+      .status(404)
+      .send("The customer with the given ID was not found.");
 
   res.send(customer);
 });
-
-function validateCustomer(customer) {
-  const schema = joi.object({
-    isGold: joi.boolean().required(),
-    name: joi.string().required().min(5),
-    phone: joi.number().required().min(5),
-  });
-
-  return schema.validate(customer);
-}
 
 module.exports = router;

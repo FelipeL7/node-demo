@@ -1,6 +1,5 @@
 const express = require("express");
 const mongoose = require("mongoose");
-
 const genres = require("./routes/genres");
 const logger = require("./middleware/logger");
 const customers = require("./routes/customers");
