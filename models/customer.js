@@ -1,4 +1,4 @@
-const joi = require("joi");
+const Joi = require("joi");
 const mongoose = require("mongoose");
 
 const Customer = mongoose.model(
@@ -22,10 +22,10 @@ const Customer = mongoose.model(
 );
 
 function validateCustomer(customer) {
-  const schema = joi.object({
-    isGold: joi.boolean().required(),
-    name: joi.string().required().min(5),
-    phone: joi.number().required().min(5),
+  const schema = Joi.object({
+    isGold: Joi.boolean().required(),
+    name: Joi.string().required().min(5),
+    phone: Joi.number().required().min(5),
   });
 
   return schema.validate(customer);
